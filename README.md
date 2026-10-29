@@ -9,7 +9,9 @@ soobin-swimwear-e-commerce/
 ├── .agents/                         # Cấu hình, tài nguyên dành cho coding agent
 ├── app/                             # Mã nguồn ứng dụng
 │   ├── main.py                      # Điểm khởi tạo ứng dụng, đăng ký router
-│   ├── config.py                    # Đọc và quản lý cấu hình ứng dụng
+│   ├── config/                      # Cấu hình ứng dụng
+│   │   ├── config.yml               # Khai báo các giá trị cấu hình dạng YAML
+│   │   └── settings.py              # Đọc, kiểm tra và cung cấp cấu hình cho ứng dụng
 │   ├── routers/                     # Tiếp nhận HTTP request, định nghĩa endpoint
 │   │   └── pages.py                 # Các route phục vụ trang HTML
 │   ├── services/                    # Xử lý nghiệp vụ
@@ -31,6 +33,7 @@ soobin-swimwear-e-commerce/
 │       ├── init.sql                 # Khởi tạo cấu trúc database
 │       └── seed.sql                 # Nạp dữ liệu ban đầu hoặc dữ liệu mẫu
 ├── .env.example                     # Mẫu biến môi trường cần cấu hình
+├── .gitignore                       # Quy định file/thư mục không đưa vào Git
 ├── AGENTS.md                        # Hướng dẫn làm việc cho coding agent
 ├── CLAUDE.md                        # Tham chiếu hướng dẫn cho Claude
 ├── Dockerfile                       # Hướng dẫn đóng gói ứng dụng thành Docker image
@@ -44,6 +47,7 @@ Thư mục `app/schema/` hiện chưa có file. Tên `product_reporisity.py` đ�
 
 | Thành phần | Chức năng |
 | --- | --- |
+| `config/` | Tập trung cấu hình ứng dụng: `config.yml` chứa các giá trị cấu hình dạng YAML; `settings.py` đọc, kiểm tra và cung cấp cấu hình cho các tầng sử dụng. |
 | `routers/` | Nhận request, lấy dữ liệu từ URL/query/body, gọi service và trả response hoặc render template. |
 | `schema/` | Chứa Pydantic model để kiểm tra dữ liệu và mô tả cấu trúc đầu vào/đầu ra, ví dụ `ProductCreate`, `ProductUpdate`, `ProductResponse`. |
 | `services/` | Thực hiện quy tắc nghiệp vụ và điều phối các thao tác qua repository. |
@@ -57,7 +61,8 @@ Thư mục `app/schema/` hiện chưa có file. Tên `product_reporisity.py` đ�
 
 - `app/schema/`: cấu trúc dữ liệu trao đổi với ứng dụng. Ví dụ, `ProductCreate` kiểm tra tên và giá khi tạo sản phẩm; `ProductResponse` xác định các trường trả về cho client.
 - `app/db/schema.py`: cấu trúc dữ liệu lưu trong database, bao gồm bảng, cột, khóa và quan hệ hoặc các ORM model tương ứng.
-- `app/config.py`: cấu hình ứng dụng. Nếu sử dụng `pydantic-settings`, lớp `Settings` có thể đặt tại đây.
+- `app/config/settings.py`: định nghĩa và kiểm tra cấu hình ứng dụng. Nếu sử dụng `pydantic-settings`, lớp `Settings` có thể đặt tại đây. Việc nạp và thứ tự ưu tiên giữa YAML, biến môi trường và giá trị mặc định cần được triển khai rõ trong phần đọc cấu hình.
+- `app/config/config.yml`: khai báo các giá trị cấu hình dạng YAML. File này hiện đang trống và chưa có logic nạp YAML trong `settings.py`.
 
 ### Luồng xử lý dự kiến
 
