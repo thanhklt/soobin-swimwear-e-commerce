@@ -1,0 +1,2 @@
+- Không được tự ý git commit hoặc git push
+- Nếu có chỗ không chắc chẵn. Hãy chủ động hỏi developer
