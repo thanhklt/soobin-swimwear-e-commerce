@@ -5,6 +5,7 @@
 - **Source of Truth**: Luôn đọc từ `source_of_true` mỗi khi bắt đầu phiên mới: https://drive.google.com/drive/folders/1BuL3ev8ow3pxkLeJFljE3wbwOz4VO-Aa?usp=sharing
 - **Xử lý lệch thông tin**: Khi quyết định hiện tại lệch với thông tin từ `source_of_true`, hãy báo cho developer biết để quyết định.
 - **Xử lý vấn đề mơ hồ**: Khi gặp vấn đề mơ hồ, không tự ý giả định mà hãy báo cho developer biết để chờ developer quyết định.
+- **Quy định gắn tag giả định [GD]**: Mọi thông tin, luồng xử lý hoặc quyết định mà agent giả định bắt buộc phải được gắn tag `[GD]` và tổng hợp đưa vào danh sách **câu hỏi mở** để chờ developer quyết định.
 
 ## 2. Kiến trúc & Phân tầng (Architecture & Boundaries)
 - **Tuân thủ nghiêm ngặt 3 tầng (3-Layer Pattern)**: Luôn đi theo luồng `Route` → `Service` → `Repository` → `Database`. Tuyệt đối không gọi tắt (Route không gọi trực tiếp Repository hoặc DB).
