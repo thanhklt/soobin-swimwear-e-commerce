@@ -1,0 +1,1 @@
+# Khung dependency của GHTK mock; chưa khai báo thư viện.

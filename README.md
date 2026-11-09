@@ -1,83 +1,132 @@
-# soobin-swimwear-e-commerce
+# Sobie — thương mại điện tử đồ bơi
+
+Dự án được tổ chức theo **modular monolith**: một ứng dụng chính gồm 12 module nghiệp vụ. GHTK mock là ứng dụng mô phỏng bên ngoài, có thư mục và Dockerfile riêng.
+
+Hiện tại repo **chỉ có khung thư mục/file**, chưa có ứng dụng chạy được, API, kết nối database, tích hợp GHTK hay logic nghiệp vụ. Các file dependency, Docker và SQL chưa có cấu hình thực thi.
 
 ## Cấu trúc thư mục
 
-Project hiện được tổ chức theo tầng kỹ thuật: router, service, repository và database. Các file ứng dụng và hạ tầng hiện vẫn là khung trống; mô tả bên dưới là trách nhiệm dự kiến của từng mục.
-
 ```text
-soobin-swimwear-e-commerce/
-├── .agents/                         # Cấu hình, tài nguyên dành cho coding agent
-├── app/                             # Mã nguồn ứng dụng
-│   ├── main.py                      # Điểm khởi tạo ứng dụng, đăng ký router
-│   ├── config/                      # Cấu hình ứng dụng
-│   │   ├── config.yml               # Khai báo các giá trị cấu hình dạng YAML
-│   │   └── settings.py              # Đọc, kiểm tra và cung cấp cấu hình cho ứng dụng
-│   ├── routers/                     # Tiếp nhận HTTP request, định nghĩa endpoint
-│   │   └── pages.py                 # Các route phục vụ trang HTML
-│   ├── services/                    # Xử lý nghiệp vụ
-│   │   └── product_services.py      # Nghiệp vụ liên quan đến sản phẩm
-│   ├── repositories/                # Truy vấn và ghi dữ liệu
-│   │   └── product_reporisity.py    # Truy cập dữ liệu sản phẩm
-│   ├── schema/                      # Pydantic model cho dữ liệu đầu vào/đầu ra
-│   ├── db/                          # Kết nối và định nghĩa cấu trúc database
-│   │   ├── engine.py                # Khởi tạo kết nối, quản lý session/transaction
-│   │   └── schema.py                # Định nghĩa bảng hoặc ORM model
-│   ├── templates/                   # Template HTML để render trang
-│   │   └── base.html                # Layout HTML dùng chung
-│   └── static/                      # Tài nguyên tĩnh: CSS, JavaScript, hình ảnh
-│       └── css/                     # Stylesheet của giao diện
-│           └── New Text Document.txt  # File giữ chỗ, chưa phải stylesheet
-├── infra/                           # Cấu hình hạ tầng và môi trường chạy
-│   ├── docker-compose.yml           # Khai báo các service và cách kết nối chúng
-│   └── postgres/                    # Script dành cho PostgreSQL
-│       ├── init.sql                 # Khởi tạo cấu trúc database
-│       └── seed.sql                 # Nạp dữ liệu ban đầu hoặc dữ liệu mẫu
-├── .env.example                     # Mẫu biến môi trường cần cấu hình
-├── .gitignore                       # Quy định file/thư mục không đưa vào Git
-├── AGENTS.md                        # Hướng dẫn làm việc cho coding agent
-├── CLAUDE.md                        # Tham chiếu hướng dẫn cho Claude
-├── Dockerfile                       # Hướng dẫn đóng gói ứng dụng thành Docker image
-├── pyproject.toml                   # Metadata, phiên bản Python, dependency và build
-└── README.md                        # Tài liệu tổng quan project
+soobin-swimwear-e-commerce/          # Repo của ứng dụng Sobie
+├── app/
+│   ├── __init__.py
+│   ├── main.py                     # Khởi tạo ứng dụng, đăng ký router
+│   ├── shared/                     # Thành phần kỹ thuật dùng chung
+│   │   ├── config/
+│   │   │   ├── config.yml
+│   │   │   └── settings.py
+│   │   ├── database/
+│   │   │   └── engine.py            # Engine, session, transaction
+│   │   ├── security/               # Tiện ích bảo mật
+│   │   ├── events/                 # Hạ tầng event nội bộ
+│   │   └── web/
+│   │       ├── templates/
+│   │       │   └── base.html
+│   │       └── static/
+│   │           └── css/
+│   └── modules/
+│       ├── iam/
+│       ├── customer/
+│       ├── catalog/
+│       ├── inventory/
+│       ├── promotion/
+│       ├── cart/
+│       ├── ordering/
+│       ├── payment/
+│       ├── shipping/
+│       ├── invoice/
+│       ├── content/
+│       └── reporting/
+├── db/
+│   └── init/
+│       ├── 01_schema.sql           # Chờ bổ sung từ sobie.sql đã sửa
+│       └── 02_seed.sql             # Chờ dữ liệu mẫu, mật khẩu băm sẵn
+├── ghtk_mock/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── templates/
+│   ├── requirements.txt
+│   └── Dockerfile
+├── infra/                          # Giữ lại cho hạ tầng PostgreSQL, Redis
+│   ├── docker-compose.yml
+│   └── postgres/
+│       ├── init.sql
+│       └── seed.sql
+├── tests/
+├── Dockerfile                      # Khung image ứng dụng chính
+├── docker-compose.yml              # Khung Compose tổng thể
+├── requirements.txt                # Khung dependency ứng dụng chính
+├── pyproject.toml                  # Metadata Python hiện có, giữ nguyên
+├── .env.example
+├── .dockerignore
+├── .gitignore
+├── AGENTS.md
+├── CLAUDE.md
+└── README.md
 ```
 
-Thư mục `app/schema/` hiện chưa có file. Tên `product_reporisity.py` được giữ nguyên theo cấu trúc hiện tại; khi chuẩn hóa tên có thể đổi thành `product_repository.py`.
+Các package Python có `__init__.py`. Những thư mục chưa có nội dung dùng `.gitkeep` để được giữ trong Git.
 
-## Trách nhiệm của các tầng
+## Cấu trúc mỗi module
 
-| Thành phần | Chức năng |
+```text
+app/modules/<module>/
+├── __init__.py
+├── router.py
+├── service.py
+├── repository.py
+├── schemas.py
+└── models.py
+```
+
+| File | Trách nhiệm |
 | --- | --- |
-| `config/` | Tập trung cấu hình ứng dụng: `config.yml` chứa các giá trị cấu hình dạng YAML; `settings.py` đọc, kiểm tra và cung cấp cấu hình cho các tầng sử dụng. |
-| `routers/` | Nhận request, lấy dữ liệu từ URL/query/body, gọi service và trả response hoặc render template. |
-| `schema/` | Chứa Pydantic model để kiểm tra dữ liệu và mô tả cấu trúc đầu vào/đầu ra, ví dụ `ProductCreate`, `ProductUpdate`, `ProductResponse`. |
-| `services/` | Thực hiện quy tắc nghiệp vụ và điều phối các thao tác qua repository. |
-| `repositories/` | Đóng gói thao tác đọc/ghi database, ví dụ tìm sản phẩm, thêm sản phẩm hoặc cập nhật giá. |
-| `db/` | Cung cấp kết nối database và định nghĩa bảng/ORM model để lưu trữ dữ liệu. |
-| `templates/` | Định nghĩa nội dung HTML; các trang có thể kế thừa layout trong `base.html`. |
-| `static/` | Chứa tài nguyên được trình duyệt tải trực tiếp như CSS, JavaScript và hình ảnh. |
-| `infra/` | Chứa cấu hình chạy các thành phần hạ tầng và script khởi tạo dữ liệu. |
+| `router.py` | Nhận request, kiểm tra dữ liệu và gọi service. |
+| `service.py` | Chứa nghiệp vụ, điều phối transaction và cung cấp service công khai cho module khác. |
+| `repository.py` | Đóng gói truy vấn dữ liệu do module sở hữu. |
+| `schemas.py` | Schema đầu vào/đầu ra, tách biệt với model lưu trữ. |
+| `models.py` | Model dữ liệu của module; với reporting là model kết quả chỉ đọc. |
 
-### Phân biệt Pydantic schema và database schema
+Luồng xử lý bắt buộc: `Route → Service → Repository → Database`. Route không gọi trực tiếp repository hoặc database.
 
-- `app/schema/`: cấu trúc dữ liệu trao đổi với ứng dụng. Ví dụ, `ProductCreate` kiểm tra tên và giá khi tạo sản phẩm; `ProductResponse` xác định các trường trả về cho client.
-- `app/db/schema.py`: cấu trúc dữ liệu lưu trong database, bao gồm bảng, cột, khóa và quan hệ hoặc các ORM model tương ứng.
-- `app/config/settings.py`: định nghĩa và kiểm tra cấu hình ứng dụng. Nếu sử dụng `pydantic-settings`, lớp `Settings` có thể đặt tại đây. Việc nạp và thứ tự ưu tiên giữa YAML, biến môi trường và giá trị mặc định cần được triển khai rõ trong phần đọc cấu hình.
-- `app/config/config.yml`: khai báo các giá trị cấu hình dạng YAML. File này hiện đang trống và chưa có logic nạp YAML trong `settings.py`.
+## Phạm vi 12 module
 
-### Luồng xử lý dự kiến
+| Module | Phạm vi |
+| --- | --- |
+| `iam` | Tài khoản, role và quyền. |
+| `customer` | Hồ sơ khách hàng, sổ địa chỉ và wishlist. |
+| `catalog` | Sản phẩm, biến thể, danh mục và thuộc tính. |
+| `inventory` | Nhà cung cấp, phiếu nhập và tồn kho. |
+| `promotion` | Chương trình khuyến mãi và lựa chọn khuyến mãi tốt nhất. |
+| `cart` | Giỏ hàng. |
+| `ordering` | Đặt hàng và trạng thái đơn. |
+| `payment` | VietQR và webhook thanh toán. |
+| `shipping` | Vận đơn, tích hợp GHTK và webhook vận chuyển. |
+| `invoice` | Hóa đơn. |
+| `content` | Đánh giá, blog, banner, trang tĩnh, cộng đồng, góp ý và cấu hình nội dung. |
+| `reporting` | Dashboard thống kê, chỉ đọc. |
 
-```text
-HTTP request
-    → Router (kiểm tra đầu vào bằng Pydantic schema khi cần)
-    → Service (xử lý nghiệp vụ)
-    → Repository (truy cập dữ liệu)
-    → Database
-```
+Các module chỉ giao tiếp qua service/interface công khai; không import repository, model lưu trữ hoặc truy cập bảng của module khác. Không đưa nghiệp vụ vào `shared/`. Module reporting lấy dữ liệu qua service/interface chỉ đọc do module sở hữu công khai, không ghi dữ liệu nghiệp vụ và không truy vấn trực tiếp bảng của module khác.
 
-Kết quả đi ngược về router để trả response hoặc render template. Khi trả JSON, router có thể dùng Pydantic schema để kiểm tra và định dạng dữ liệu đầu ra.
+Cấu hình kỹ thuật trong `shared/config/` khác với cấu hình nội dung website do module `content` quản lý. Tiện ích bảo mật trong `shared/security/` khác với nghiệp vụ tài khoản, role và quyền của `iam`.
 
-## Định hướng modular monolith
+## Database và hạ tầng
 
-Cấu trúc hiện tại chia theo tầng kỹ thuật. Nếu chuyển sang modular monolith, có thể gom từng nghiệp vụ vào `app/modules/`, ví dụ `catalog`, `cart`, `orders`, `customers`. Mỗi module sở hữu router, service, repository, Pydantic schema và database model của mình.
+- `db/init/01_schema.sql` dành cho schema từ `sobie.sql` đã sửa; `02_seed.sql` dành cho dữ liệu mẫu với mật khẩu đã băm. Hai file hiện chỉ có chú thích, chưa tạo bảng hoặc tài khoản.
+- Khi triển khai PostgreSQL, mount `db/init/` vào `/docker-entrypoint-initdb.d/` để chạy script theo thứ tự tên file trên volume dữ liệu mới. Cấu hình mount chưa được triển khai.
+- Script khởi tạo không tự chạy lại khi volume đã có database; không xóa volume có dữ liệu để áp dụng thay đổi schema.
+- Giữ nguyên `infra/` theo yêu cầu để cấu hình PostgreSQL và Redis về sau. Các file cũ trong `infra/` hiện vẫn rỗng. Không duy trì bản sao schema/seed tại hai nơi; `db/init/` là vị trí của bộ SQL trong cấu trúc mới.
+- Compose ở gốc dành cho hệ thống tổng thể; Compose trong `infra/` dành cho hạ tầng. Cả hai hiện chưa khai báo service, chưa thể dùng để khởi động hệ thống.
 
-Các module giao tiếp qua interface/service công khai hoặc event, tránh truy cập trực tiếp repository và sửa dữ liệu thuộc module khác. Toàn bộ ứng dụng vẫn có thể chạy trong cùng một tiến trình, triển khai chung và sử dụng chung một database.
+Khi triển khai nghiệp vụ, mọi API dùng envelope `success`, `data`, `error`, `meta`; tiền dùng số nguyên VND hoặc `Decimal` với `ROUND_HALF_UP`; thời gian DB dùng UTC. Kiểm tra/trừ tồn, áp khuyến mãi và tạo đơn phải dùng cùng transaction, kể cả khi đi qua nhiều service. Secret được nạp từ biến môi trường.
+
+## Trạng thái và phần còn chờ
+
+Đã có khung module và vị trí dành cho hạ tầng, mock, SQL, template và kiểm thử. Chưa khai báo dependency, chưa có lệnh chạy ứng dụng hoặc bộ test nghiệp vụ. `pyproject.toml` được giữ nguyên; các file `requirements.txt` chưa khai báo thư viện.
+
+Câu hỏi mở cần bổ sung trước khi triển khai:
+
+- Cung cấp bản `sobie.sql` đã sửa để điền `01_schema.sql`; file này chưa có trong repo.
+- Xác định bộ dữ liệu mẫu và cơ chế băm mật khẩu để điền `02_seed.sql`.
+
+Nguồn yêu cầu: [source_of_true](https://drive.google.com/drive/folders/1BuL3ev8ow3pxkLeJFljE3wbwOz4VO-Aa). Cấu trúc 12 module và việc giữ `infra/` theo xác nhận của developer trong phiên làm việc này. Những khác biệt nghiệp vụ giữa SRS và PRD cần được chốt khi triển khai từng tính năng.
